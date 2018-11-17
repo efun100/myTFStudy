@@ -9,6 +9,8 @@ print(w1.dtype)
 print(w1.shape)
 print(w2.dtype)
 
+x = tf.constant([[0.5, 0.3]])
+
 a = tf.matmul(x, w1)
 y = tf.matmul(a, w2)
 
@@ -18,4 +20,5 @@ with tf.Session() as sess:
     saver.restore(sess, "save/save_net.ckpt")
     print(sess.run(w1))
     print(sess.run(w2))
-
+    print(sess.run(x))
+    print(sess.run(y))

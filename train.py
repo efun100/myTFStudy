@@ -25,8 +25,10 @@ rdm = RandomState(1)
 dataset_size = 128
 
 X = rdm.rand(dataset_size, 2)
+print(X)
 
 Y = [[int(x1 + x2 < 1)] for (x1, x2) in X]
+print(Y)
 
 saver = tf.train.Saver()
 
