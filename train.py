@@ -6,6 +6,7 @@ batch_size = 8
 
 w1 = tf.Variable(tf.random_normal([2, 3], stddev = 1, seed = 1))
 w2 = tf.Variable(tf.random_normal([3, 1], stddev = 1, seed = 1))
+b = tf.Variable(tf.random_normal([1, 1], stddev=1, seed=1))
 
 print(w1.dtype)
 print(w1.shape)
@@ -15,19 +16,19 @@ x = tf.placeholder(tf.float32, shape = (None, 2), name = 'x-input')
 y_ = tf.placeholder(tf.float32, shape = (None, 1), name = 'y-input')
 
 a = tf.matmul(x, w1)
-y = tf.matmul(a, w2)
+y = tf.matmul(a, w2) + b
 
-cross_entropy = -tf.reduce_mean(y_ * tf.log(tf.clip_by_value(y, 1e-10, 1.0)))
+cross_entropy = tf.reduce_mean(tf.square(y_ - y))
 train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
 
 rdm = RandomState(1)
 
-dataset_size = 128
+dataset_size = 512
 
 X = rdm.rand(dataset_size, 2)
 print(X)
 
-Y = [[int(x1 + x2 < 1)] for (x1, x2) in X]
+Y = [[x1 + x2] for (x1, x2) in X]
 print(Y)
 
 saver = tf.train.Saver()
@@ -39,7 +40,7 @@ with tf.Session() as sess:
     print(sess.run(w1))
     print(sess.run(w2))
 
-    STEPS = 5000
+    STEPS = 50000
 
     for i in range(STEPS):
         start = (i * batch_size) % dataset_size
