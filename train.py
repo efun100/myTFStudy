@@ -28,7 +28,7 @@ dataset_size = 512
 X = rdm.rand(dataset_size, 2)
 print(X)
 
-Y = [[x1 + x2] for (x1, x2) in X]
+Y = [[x1 - x2] for (x1, x2) in X]
 print(Y)
 
 saver = tf.train.Saver()
