@@ -4,9 +4,17 @@ import numpy as np
 
 batch_size = 8
 
-w1 = tf.Variable(tf.random_normal([2, 3], stddev = 1, seed = 1))
-w2 = tf.Variable(tf.random_normal([3, 1], stddev = 1, seed = 1))
-b = tf.Variable(tf.random_normal([1, 1], stddev=1, seed=1))
+w1 = tf.Variable(tf.random_normal([2, 4], stddev = 1, seed = 1))
+w2 = tf.Variable(tf.random_normal([4, 8], stddev = 1, seed = 1))
+w3 = tf.Variable(tf.random_normal([8, 4], stddev = 1, seed = 1))
+w4 = tf.Variable(tf.random_normal([4, 2], stddev = 1, seed = 1))
+w5 = tf.Variable(tf.random_normal([2, 1], stddev = 1, seed = 1))
+
+b1 = tf.Variable(tf.random_normal([1, 4], stddev=1, seed=1))
+b2 = tf.Variable(tf.random_normal([1, 8], stddev=1, seed=1))
+b3 = tf.Variable(tf.random_normal([1, 4], stddev=1, seed=1))
+b4 = tf.Variable(tf.random_normal([1, 2], stddev=1, seed=1))
+b5 = tf.Variable(tf.random_normal([1, 1], stddev=1, seed=1))
 
 print(w1.dtype)
 print(w1.shape)
@@ -15,8 +23,11 @@ print(w2.dtype)
 x = tf.placeholder(tf.float32, shape = (None, 2), name = 'x-input')
 y_ = tf.placeholder(tf.float32, shape = (None, 1), name = 'y-input')
 
-a = tf.matmul(x, w1)
-y = tf.matmul(a, w2) + b
+a = tf.nn.relu(tf.matmul(x, w1) + b1)
+b = tf.nn.relu(tf.matmul(a, w2) + b2)
+c = tf.nn.relu(tf.matmul(b, w3) + b3)
+d = tf.nn.relu(tf.matmul(c, w4) + b4)
+y = tf.nn.relu(tf.matmul(d, w5) + b5)
 
 cross_entropy = tf.reduce_mean(tf.square(y_ - y))
 train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
@@ -25,10 +36,10 @@ rdm = RandomState(1)
 
 dataset_size = 512
 
-X = rdm.rand(dataset_size, 2)
+X = rdm.uniform(1, 30, (dataset_size, 2))
 print(X)
 
-Y = [[x1 - x2] for (x1, x2) in X]
+Y = [[x1 * x2] for (x1, x2) in X]
 print(Y)
 
 saver = tf.train.Saver()
@@ -40,7 +51,7 @@ with tf.Session() as sess:
     print(sess.run(w1))
     print(sess.run(w2))
 
-    STEPS = 50000
+    STEPS = 200000
 
     for i in range(STEPS):
         start = (i * batch_size) % dataset_size
@@ -57,8 +68,4 @@ with tf.Session() as sess:
 
     save_path = saver.save(sess, "save/save_net.ckpt")
     print("Save to path: ", save_path)
-    
-
-    #np.save("w1.npy", w1)
-    #np.save("w2.npy", w2)
 
