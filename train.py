@@ -2,19 +2,23 @@ import tensorflow as tf
 from numpy.random import RandomState
 import numpy as np
 
-batch_size = 8
+batch_size = 16
 
 w1 = tf.Variable(tf.random_normal([2, 4], stddev = 1, seed = 1))
 w2 = tf.Variable(tf.random_normal([4, 8], stddev = 1, seed = 1))
-w3 = tf.Variable(tf.random_normal([8, 4], stddev = 1, seed = 1))
-w4 = tf.Variable(tf.random_normal([4, 2], stddev = 1, seed = 1))
-w5 = tf.Variable(tf.random_normal([2, 1], stddev = 1, seed = 1))
+w3 = tf.Variable(tf.random_normal([8, 16], stddev = 1, seed = 1))
+w4 = tf.Variable(tf.random_normal([16, 8], stddev = 1, seed = 1))
+w5 = tf.Variable(tf.random_normal([8, 4], stddev = 1, seed = 1))
+w6 = tf.Variable(tf.random_normal([4, 2], stddev = 1, seed = 1))
+w7 = tf.Variable(tf.random_normal([2, 1], stddev = 1, seed = 1))
 
 b1 = tf.Variable(tf.random_normal([1, 4], stddev=1, seed=1))
 b2 = tf.Variable(tf.random_normal([1, 8], stddev=1, seed=1))
-b3 = tf.Variable(tf.random_normal([1, 4], stddev=1, seed=1))
-b4 = tf.Variable(tf.random_normal([1, 2], stddev=1, seed=1))
-b5 = tf.Variable(tf.random_normal([1, 1], stddev=1, seed=1))
+b3 = tf.Variable(tf.random_normal([1, 16], stddev=1, seed=1))
+b4 = tf.Variable(tf.random_normal([1, 8], stddev=1, seed=1))
+b5 = tf.Variable(tf.random_normal([1, 4], stddev=1, seed=1))
+b6 = tf.Variable(tf.random_normal([1, 2], stddev=1, seed=1))
+b7 = tf.Variable(tf.random_normal([1, 1], stddev=1, seed=1))
 
 print(w1.dtype)
 print(w1.shape)
@@ -27,19 +31,21 @@ a = tf.nn.relu(tf.matmul(x, w1) + b1)
 b = tf.nn.relu(tf.matmul(a, w2) + b2)
 c = tf.nn.relu(tf.matmul(b, w3) + b3)
 d = tf.nn.relu(tf.matmul(c, w4) + b4)
-y = tf.nn.relu(tf.matmul(d, w5) + b5)
+e = tf.nn.relu(tf.matmul(d, w5) + b5)
+f = tf.nn.relu(tf.matmul(e, w6) + b6)
+y = tf.matmul(f, w7) + b7
 
 cross_entropy = tf.reduce_mean(tf.square(y_ - y))
-train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(0.0001).minimize(cross_entropy)
 
 rdm = RandomState(1)
 
-dataset_size = 512
+dataset_size = 1024
 
-X = rdm.uniform(1, 30, (dataset_size, 2))
+X = rdm.uniform(1, 300, (dataset_size, 2))
 print(X)
 
-Y = [[x1 * x2] for (x1, x2) in X]
+Y = [[x1 - x2] for (x1, x2) in X]
 print(Y)
 
 saver = tf.train.Saver()
@@ -51,7 +57,7 @@ with tf.Session() as sess:
     print(sess.run(w1))
     print(sess.run(w2))
 
-    STEPS = 200000
+    STEPS = 100000
 
     for i in range(STEPS):
         start = (i * batch_size) % dataset_size
